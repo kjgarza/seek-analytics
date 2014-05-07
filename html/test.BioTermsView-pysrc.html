@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>test.BioTermsView</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;test ::
+        Module&nbsp;BioTermsView
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="test.BioTermsView-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="test.BioTermsView-module.html">Module test.BioTermsView</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">BioTermsMining</tt> <tt class="py-keyword">import</tt> <tt class="py-op">*</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">flask</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Flask</tt><tt class="py-op">,</tt> <tt class="py-name">render_template</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt id="link-0" class="py-name" targets="Variable test.BioTermsView.app=test.BioTermsView-module.html#app"><a title="test.BioTermsView.app" class="py-name" href="#" onclick="return doclink('link-0', 'app', 'link-0');">app</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Flask</tt><tt class="py-op">(</tt><tt class="py-name">__name__</tt><tt class="py-op">)</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt id="link-1" class="py-name" targets="Variable test.BioTermsView.db=test.BioTermsView-module.html#db"><a title="test.BioTermsView.db" class="py-name" href="#" onclick="return doclink('link-1', 'db', 'link-1');">db</a></tt> <tt class="py-op">=</tt> <tt class="py-name">sqlsoup</tt><tt class="py-op">.</tt><tt class="py-name">SQLSoup</tt><tt class="py-op">(</tt><tt class="py-string">'mysql+mysqldb://root:@127.0.0.1/sysmo?charset=ascii'</tt><tt class="py-op">)</tt> </tt>
+<a name="hello_world"></a><div id="hello_world-def"><a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-decorator">@</tt><tt class="py-decorator">app</tt><tt class="py-op">.</tt><tt class="py-name">route</tt><tt class="py-op">(</tt><tt class="py-string">'/'</tt><tt class="py-op">)</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt> <a class="py-toggle" href="#" id="hello_world-toggle" onclick="return toggle('hello_world');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="test.BioTermsView-module.html#hello_world">hello_world</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="hello_world-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="hello_world-expanded"><a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-string">'Hello World!'</tt> </tt>
+</div><a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"> </tt>
+<a name="batch_efficiency"></a><div id="batch_efficiency-def"><a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-decorator">@</tt><tt class="py-decorator">app</tt><tt class="py-op">.</tt><tt class="py-name">route</tt><tt class="py-op">(</tt><tt class="py-string">'/eff'</tt><tt class="py-op">)</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt> <a class="py-toggle" href="#" id="batch_efficiency-toggle" onclick="return toggle('batch_efficiency');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="test.BioTermsView-module.html#batch_efficiency">batch_efficiency</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="batch_efficiency-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="batch_efficiency-expanded"><a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">    <tt class="py-comment"># myset = [97, 8, 113, 149, 175, 176, 112, 84, 162, 186, 94, 148, 61, 102, 105, 183, 111, 127, 133, 182, 128, 132,</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">    <tt class="py-comment"># 181, 184, 103, 131, 104, 108, 143, 110, 106, 130, 107, 190, 100, 185, 206]</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">    <tt class="py-name">myset</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-number">34</tt><tt class="py-op">,</tt> <tt class="py-number">98</tt><tt class="py-op">,</tt> <tt class="py-number">134</tt><tt class="py-op">,</tt> <tt class="py-number">35</tt><tt class="py-op">,</tt> <tt class="py-number">136</tt><tt class="py-op">,</tt> <tt class="py-number">149</tt><tt class="py-op">,</tt> <tt class="py-number">176</tt><tt class="py-op">,</tt> <tt class="py-number">175</tt><tt class="py-op">,</tt> <tt class="py-number">174</tt><tt class="py-op">,</tt> <tt class="py-number">179</tt><tt class="py-op">,</tt> <tt class="py-number">93</tt><tt class="py-op">,</tt> <tt class="py-number">146</tt><tt class="py-op">,</tt> <tt class="py-number">142</tt><tt class="py-op">,</tt> <tt class="py-number">87</tt><tt class="py-op">,</tt> <tt class="py-number">177</tt><tt class="py-op">,</tt> <tt class="py-number">100</tt><tt class="py-op">,</tt> <tt class="py-number">205</tt><tt class="py-op">,</tt> <tt class="py-number">206</tt><tt class="py-op">]</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">    <tt class="py-comment"># myset = [97]</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">    <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt id="link-2" class="py-name"><a title="test.BioTermsView.db" class="py-name" href="#" onclick="return doclink('link-2', 'db', 'link-1');">db</a></tt><tt class="py-op">.</tt><tt class="py-name">execute</tt><tt class="py-op">(</tt><tt class="py-string">"SELECT * FROM publications WHERE pubmed_id IS NOT NULL"</tt><tt class="py-op">)</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">    <tt class="py-name">publications</tt> <tt class="py-op">=</tt> <tt class="py-name">pandas</tt><tt class="py-op">.</tt><tt class="py-name">DataFrame</tt><tt class="py-op">(</tt><tt class="py-name">s</tt><tt class="py-op">.</tt><tt class="py-name">fetchall</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">    <tt class="py-name">publications</tt><tt class="py-op">.</tt><tt class="py-name">columns</tt> <tt class="py-op">=</tt> <tt class="py-name">s</tt><tt class="py-op">.</tt><tt class="py-name">keys</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">    <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt class="py-name">publications</tt><tt class="py-op">[</tt><tt class="py-name">publications</tt><tt class="py-op">.</tt><tt class="py-name">id</tt><tt class="py-op">.</tt><tt class="py-name">isin</tt><tt class="py-op">(</tt><tt class="py-name">myset</tt><tt class="py-op">)</tt><tt class="py-op">]</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">    <tt class="py-comment"># a = BioTermsMining()</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">    <tt class="py-name">a</tt> <tt class="py-op">=</tt> <tt class="py-name">Publication</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">    <tt class="py-name">stas_tbl</tt> <tt class="py-op">=</tt> <tt class="py-name">pandas</tt><tt class="py-op">.</tt><tt class="py-name">DataFrame</tt><tt class="py-op">(</tt><tt class="py-name">columns</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-string">'pubmed_id'</tt><tt class="py-op">,</tt> <tt class="py-string">'recall'</tt><tt class="py-op">,</tt> <tt class="py-string">'precision'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">index</tt><tt class="py-op">,</tt> <tt class="py-name">row</tt> <tt class="py-keyword">in</tt> <tt class="py-name">s</tt><tt class="py-op">.</tt><tt class="py-name">iterrows</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'pubmed_id'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">None</tt> <tt class="py-op">!=</tt> <tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'pubmed_id'</tt><tt class="py-op">]</tt><tt class="py-op">:</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">            <tt class="py-name">stas</tt> <tt class="py-op">=</tt> <tt class="py-name">a</tt><tt class="py-op">.</tt><tt class="py-name">get_recall</tt><tt class="py-op">(</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'pubmed_id'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">                <tt class="py-name">stas_tbl</tt> <tt class="py-op">=</tt> <tt class="py-name">stas_tbl</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">stas</tt><tt class="py-op">,</tt> <tt class="py-name">ignore_index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt class="py-name">AttributeError</tt><tt class="py-op">:</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">                <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt class="py-string">"AttributeError"</tt><tt class="py-op">)</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">    <tt class="py-name">avg_recall</tt> <tt class="py-op">=</tt> <tt class="py-name">reduce</tt><tt class="py-op">(</tt><tt class="py-keyword">lambda</tt> <tt class="py-name">x</tt><tt class="py-op">,</tt> <tt class="py-name">y</tt><tt class="py-op">:</tt> <tt class="py-name">x</tt> <tt class="py-op">+</tt> <tt class="py-name">y</tt><tt class="py-op">,</tt> <tt class="py-name">stas_tbl</tt><tt class="py-op">[</tt><tt class="py-string">"recall"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">stas_tbl</tt><tt class="py-op">[</tt><tt class="py-string">"recall"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">    <tt class="py-name">avg_precision</tt> <tt class="py-op">=</tt> <tt class="py-name">reduce</tt><tt class="py-op">(</tt><tt class="py-keyword">lambda</tt> <tt class="py-name">x</tt><tt class="py-op">,</tt> <tt class="py-name">y</tt><tt class="py-op">:</tt> <tt class="py-name">x</tt> <tt class="py-op">+</tt> <tt class="py-name">y</tt><tt class="py-op">,</tt> <tt class="py-name">stas_tbl</tt><tt class="py-op">[</tt><tt class="py-string">"precision"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">stas_tbl</tt><tt class="py-op">[</tt><tt class="py-string">"precision"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">    <tt class="py-keyword">print</tt> <tt class="py-name">stas_tbl</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-op">{</tt><tt class="py-string">'pubmed_id'</tt><tt class="py-op">:</tt> <tt class="py-string">'AVG'</tt><tt class="py-op">,</tt> <tt class="py-string">'recall'</tt><tt class="py-op">:</tt> <tt class="py-name">avg_recall</tt><tt class="py-op">,</tt> <tt class="py-string">'precision'</tt><tt class="py-op">:</tt> <tt class="py-name">avg_precision</tt><tt class="py-op">}</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">ignore_index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="get_twenty_wo_isa"></a><div id="get_twenty_wo_isa-def"><a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-decorator">@</tt><tt class="py-decorator">app</tt><tt class="py-op">.</tt><tt class="py-name">route</tt><tt class="py-op">(</tt><tt class="py-string">'/wo_isa'</tt><tt class="py-op">)</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt> <a class="py-toggle" href="#" id="get_twenty_wo_isa-toggle" onclick="return toggle('get_twenty_wo_isa');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="test.BioTermsView-module.html#get_twenty_wo_isa">get_twenty_wo_isa</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="get_twenty_wo_isa-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="get_twenty_wo_isa-expanded"><a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">    <tt class="py-name">r</tt> <tt class="py-op">=</tt> <tt class="py-name">pandas</tt><tt class="py-op">.</tt><tt class="py-name">DataFrame</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">    <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt class="py-name">pandas</tt><tt class="py-op">.</tt><tt class="py-name">DataFrame</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">    <tt class="py-comment"># r['ids'] = [19321498, 18395130, 20412803, 20214910, 17725564, 18491319, 18546160, 19047653, 19193632,19403106, 19374982, 21133689, 22281772, 18086213, 21219666, 20947526, 21479178, 22096228,23175651, 22052476]</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">    <tt class="py-name">r</tt><tt class="py-op">[</tt><tt class="py-string">'ids'</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-number">19095699</tt><tt class="py-op">,</tt><tt class="py-number">18937253</tt><tt class="py-op">,</tt><tt class="py-number">19933161</tt><tt class="py-op">,</tt><tt class="py-number">20197501</tt><tt class="py-op">,</tt><tt class="py-number">17822389</tt><tt class="py-op">,</tt><tt class="py-number">20502716</tt><tt class="py-op">,</tt><tt class="py-number">18208493</tt><tt class="py-op">,</tt><tt class="py-number">18628769</tt><tt class="py-op">,</tt><tt class="py-number">18952880</tt><tt class="py-op">,</tt><tt class="py-number">18474306</tt><tt class="py-op">,</tt><tt class="py-number">20389117</tt><tt class="py-op">,</tt><tt class="py-number">19403106</tt><tt class="py-op">,</tt><tt class="py-number">20726779</tt><tt class="py-op">,</tt><tt class="py-number">22038603</tt><tt class="py-op">,</tt><tt class="py-number">22281772</tt><tt class="py-op">,</tt><tt class="py-number">21074401</tt><tt class="py-op">,</tt><tt class="py-number">21947264</tt><tt class="py-op">,</tt><tt class="py-number">23136871</tt><tt class="py-op">]</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">    <tt class="py-comment"># r['ids'] = [20238180,19688348,20739311,20617312,21252224,22325620,21212688,22511268,22607453,22686585,22712534,22870390,23332010]</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">    <tt class="py-name">r</tt><tt class="py-op">[</tt><tt class="py-string">"abstract"</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-string">""</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">    <tt class="py-name">p</tt> <tt class="py-op">=</tt> <tt class="py-name">Publication</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">    <tt class="py-name">models_table</tt> <tt class="py-op">=</tt> <tt class="py-name">ModelTableView</tt><tt class="py-op">(</tt><tt id="link-3" class="py-name"><a title="test.BioTermsView.db" class="py-name" href="#" onclick="return doclink('link-3', 'db', 'link-1');">db</a></tt><tt class="py-op">.</tt><tt class="py-name">models</tt><tt class="py-op">)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">    <tt class="py-comment"># models_table = DataTableView(db.data_files)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">lala</tt><tt class="py-op">(</tt><tt class="py-param">contributor_id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">        <tt class="py-name">assets</tt> <tt class="py-op">=</tt> <tt class="py-name">models_table</tt><tt class="py-op">.</tt><tt class="py-name">view</tt><tt class="py-op">[</tt><tt class="py-name">models_table</tt><tt class="py-op">.</tt><tt class="py-name">view</tt><tt class="py-op">.</tt><tt class="py-name">contributor_id</tt> <tt class="py-op">==</tt> <tt class="py-name">contributor_id</tt><tt class="py-op">]</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">assets</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">"No assets"</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-comment"># lo = str("Title: " + assets['title'] + assets['description'])</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">index</tt><tt class="py-op">,</tt> <tt class="py-name">row</tt> <tt class="py-keyword">in</tt> <tt class="py-name">assets</tt><tt class="py-op">.</tt><tt class="py-name">iterrows</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-string">"&gt; __id:__ "</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'id'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-string">"&gt; __Contr:__ "</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'contributor_id'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-string">"&gt; __Title:__ "</tt> <tt class="py-op">+</tt> <tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'title'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-string">"&gt; __Description:__ "</tt> <tt class="py-op">+</tt> <tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'description'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">"------"</tt> </tt>
+</div><a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">        <tt class="py-comment"># return lo</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">xsols</tt><tt class="py-op">(</tt><tt class="py-param">pubmed_id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">        <tt class="py-name">handle</tt> <tt class="py-op">=</tt> <tt class="py-name">efetch</tt><tt class="py-op">(</tt><tt id="link-4" class="py-name"><a title="test.BioTermsView.db" class="py-name" href="#" onclick="return doclink('link-4', 'db', 'link-1');">db</a></tt><tt class="py-op">=</tt><tt class="py-string">'pubmed'</tt><tt class="py-op">,</tt> <tt class="py-name">id</tt><tt class="py-op">=</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">pubmed_id</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">retmode</tt><tt class="py-op">=</tt><tt class="py-string">'text'</tt><tt class="py-op">,</tt> <tt class="py-name">rettype</tt><tt class="py-op">=</tt><tt class="py-string">'abstract'</tt><tt class="py-op">,</tt> <tt class="py-name">email</tt><tt class="py-op">=</tt><tt class="py-string">'garzaguk@.cs.man.ac.uk'</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">        <tt class="py-name">text</tt> <tt class="py-op">=</tt> <tt class="py-name">handle</tt><tt class="py-op">.</tt><tt class="py-name">read</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">text</tt> </tt>
+</div><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">index</tt><tt class="py-op">,</tt> <tt class="py-name">row</tt> <tt class="py-keyword">in</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt class="py-name">iterrows</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-name">handle</tt> <tt class="py-op">=</tt> <tt class="py-name">efetch</tt><tt class="py-op">(</tt><tt id="link-5" class="py-name"><a title="test.BioTermsView.db" class="py-name" href="#" onclick="return doclink('link-5', 'db', 'link-1');">db</a></tt><tt class="py-op">=</tt><tt class="py-string">'pubmed'</tt><tt class="py-op">,</tt> <tt class="py-name">id</tt><tt class="py-op">=</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'ids'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">retmode</tt><tt class="py-op">=</tt><tt class="py-string">'text'</tt><tt class="py-op">,</tt> <tt class="py-name">rettype</tt><tt class="py-op">=</tt><tt class="py-string">'abstract'</tt><tt class="py-op">,</tt> <tt class="py-name">email</tt><tt class="py-op">=</tt><tt class="py-string">'garzaguk@.cs.man.ac.uk'</tt><tt class="py-op">)</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">        <tt class="py-name">text</tt> <tt class="py-op">=</tt> <tt class="py-name">handle</tt><tt class="py-op">.</tt><tt class="py-name">read</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt class="py-comment"># row.ix["abstract"] = text</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"###Publication:"</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-name">text</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">        <tt class="py-name">user_ids</tt> <tt class="py-op">=</tt> <tt class="py-name">p</tt><tt class="py-op">.</tt><tt class="py-name">ask_pubmed_authors</tt><tt class="py-op">(</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">row</tt><tt class="py-op">[</tt><tt class="py-string">'ids'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">        <tt class="py-name">r</tt><tt class="py-op">[</tt><tt class="py-string">"desc"</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">user_ids</tt><tt class="py-op">.</tt><tt class="py-name">apply</tt><tt class="py-op">(</tt><tt class="py-keyword">lambda</tt> <tt class="py-name">line</tt><tt class="py-op">:</tt> <tt class="py-name">lala</tt><tt class="py-op">(</tt><tt class="py-name">line</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">" "</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"------"</tt> </tt>
+</div><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">    <tt class="py-comment"># r["abstract"] = r['ids'].apply(lambda line: xsols(line))</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">    <tt class="py-comment"># return render_template("wo_isa.html", name="sasa", data=r.to_html(classes='list'))</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-keyword">if</tt> <tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">'__main__'</tt><tt class="py-op">:</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">    <tt id="link-6" class="py-name"><a title="test.BioTermsView.app" class="py-name" href="#" onclick="return doclink('link-6', 'app', 'link-0');">app</a></tt><tt class="py-op">.</tt><tt class="py-name">run</tt><tt class="py-op">(</tt><tt class="py-name">debug</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-comment"># get_twenty_wo_isa()</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-comment"># c = AssetsView()</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-comment"># print(c.assets)</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-comment"># b = Publication()</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-comment"># b.get_used_items("22686585")</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-comment"># b.get_data_sharing_ratio("22686585")</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line"><tt class="py-comment"># s.apply(lambda row: a.get_recall_pubmed_id(row['pubmed_id']), axis=1)</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line"><tt class="py-comment"># batch_efficiency()</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-comment"># a = Publication()</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall("22686585", a.get_data_sharing_ratio("22686585")["id"])</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-comment"># a = BioTermsMining()</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_ids(["21252224","21252224"])</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("22686585")</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-comment"># ## a.get_recall_pubmed_id("20053288")</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("21097579")</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("21252224")</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"><tt class="py-comment"># # # a.get_recall_pubmed_id("21106498")</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("19802714")</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-comment"># # # a.get_recall_pubmed_id("21815947")</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("22712534")</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("22511268")</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("22923596")</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall_pubmed_id("23332010")</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-comment"># a.get_recall("21252224",pandas.DataFrame([54,88,1076]))</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-comment"># s = a.termine_service(</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-comment">#     "Alkaline phosphatase is normally localized to the periplasm of Escherichia coli and is unable to fold into its native conformation if retained in the cytoplasm of growing cells. The alkaline phosphatase activity of E. coli expressing a version of the protein without a signal sequence was nonetheless found to increase gradually when the growth of cells was suspended. At least 30% of the ")</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"><tt class="py-comment"># print(pandas.DataFrame.from_records(s))</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line"><tt class="py-comment"># print(pandas.DataFrame(s, columns=["p", "term"]))</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"><tt class="py-comment"># print(type(s))</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"><tt class="py-comment"># s2= s.encode('ascii','ignore')</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line"><tt class="py-comment"># print(type(s2))</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"><tt class="py-comment"># splits = s2.split('\n')</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line"><tt class="py-comment"># print(splits)</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line"><tt class="py-comment"># for i, row in enumerate(splits):</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"><tt class="py-comment">#     title_trans=''.join(chr(c) if chr(c).isupper() or chr(c).islower() else ' ' for c in range(256))</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"><tt class="py-comment">#     # la = ''.join([i for i in row if not i.isdigit()])</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"><tt class="py-comment">#     # print(row.translate(title_trans).strip())</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-comment">#     splits[i] = row.translate(title_trans).strip()</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt class="py-comment"># print(splits)</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"><tt class="py-comment"># terms = [w.split('\n', 2)[1] for w in words]</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line"><tt class="py-comment"># main(a, "21252224")</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Mon Apr 28 22:41:54 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

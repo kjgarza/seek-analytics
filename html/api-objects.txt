@@ -1,0 +1,6 @@
+test.BioTermsView	test.BioTermsView-module.html
+test.BioTermsView.app	test.BioTermsView-module.html#app
+test.BioTermsView.db	test.BioTermsView-module.html#db
+test.BioTermsView.get_twenty_wo_isa	test.BioTermsView-module.html#get_twenty_wo_isa
+test.BioTermsView.batch_efficiency	test.BioTermsView-module.html#batch_efficiency
+test.BioTermsView.hello_world	test.BioTermsView-module.html#hello_world
