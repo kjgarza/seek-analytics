@@ -16,19 +16,22 @@ def hello_world():
 def batch_efficiency():
     # myset = [97, 8, 113, 149, 175, 176, 112, 84, 162, 186, 94, 148, 61, 102, 105, 183, 111, 127, 133, 182, 128, 132,
     # 181, 184, 103, 131, 104, 108, 143, 110, 106, 130, 107, 190, 100, 185, 206]
-    myset = [34, 98, 134, 35, 136, 149, 176, 175, 174, 179, 93, 146, 142, 87, 177, 100, 205, 206]
-    #myset = [97]
+    myset = [34, 98, 134, 35, 136, 149, 176, 175, 174, 179, 93, 146, 142, 87]
+    # myset = [97]
     s = db.execute("SELECT * FROM publications WHERE pubmed_id IS NOT NULL")
     publications = pandas.DataFrame(s.fetchall())
     publications.columns = s.keys()
     s = publications[publications.id.isin(myset)]
     # a = BioTermsMining()
-    a = Publication()
+    # a = Publication()
     stas_tbl = pandas.DataFrame(columns=['pubmed_id', 'recall', 'precision'])
     for index, row in s.iterrows():
         print str(int(row['pubmed_id']))
         if None != row['pubmed_id']:
-            stas = a.get_recall(str(int(row['pubmed_id'])))
+            a = Publication(str(int(row['pubmed_id'])))
+            stas = a.get_recall()
+            print stas
+            # stas = a.get_recall(str(int(row['pubmed_id'])))
             try:
                 stas_tbl = stas_tbl.append(stas, ignore_index=True)
             except AttributeError:
@@ -36,6 +39,7 @@ def batch_efficiency():
     avg_recall = reduce(lambda x, y: x + y, stas_tbl["recall"]) / len(stas_tbl["recall"])
     avg_precision = reduce(lambda x, y: x + y, stas_tbl["precision"]) / len(stas_tbl["precision"])
     print stas_tbl.append([{'pubmed_id': 'AVG', 'recall': avg_recall, 'precision': avg_precision}], ignore_index=True)
+    return 'PASS!'
 
 @app.route('/wo_isa')
 def get_twenty_wo_isa():
@@ -81,7 +85,7 @@ def get_twenty_wo_isa():
         print "###Publication:"
         print text
 
-        user_ids = p.ask_pubmed_authors(str(row['ids']))
+        user_ids = p.get_authors(str(row['ids']))
         r["desc"] = user_ids.apply(lambda line: lala(line))
         print " "
         print "------"
@@ -90,13 +94,13 @@ def get_twenty_wo_isa():
     # r["abstract"] = r['ids'].apply(lambda line: xsols(line))
 
     # return render_template("wo_isa.html", name="sasa", data=r.to_html(classes='list'))
-
+    return 'PASS!'
 
 @app.route('/permission')
 def permissions():
     a = Asset(15).get_permissions()
     print(a)
-
+    return 'PASS!'
 
 @app.route('/test_AssetsView')
 def permissions2():
@@ -119,9 +123,16 @@ def permissions2():
     #
     a.assets.diff().hist(color='k', alpha=0.5)
 
-    return render_template("analysis.html", name="lol", data=a.assets.to_html())
+    return 'PASS!'
+    # return render_template("analysis.html", name="lol", data=a.assets.to_html())
+
+@app.route('/get_sharing_ratio')
+def get_sharing_ratio():
+    p = Publication("22607453")
+    p.get_data_sharing_ratio()
 
 
+    return 'PASS!'
 
 if __name__ == '__main__':
     app.run(debug=True)

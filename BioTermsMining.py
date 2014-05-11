@@ -52,23 +52,28 @@ class PublicationView:
         self.view.terms[self.view.id.isin(ids)] = self.view[self.view.id.isin(ids)].apply(
             lambda row: TermsBag().termine_service(row['title'] + ". " + row['description']), axis=1)
 
+    def fill_ds_ratio(self):
+        self.view["ds_ration"] = 0.0
+        self.view.ds_ration.apply(lambda row: Publication(row["pubmed_id"]).get_data_sharing_ratio(), axis=1)
+
 
 class Publication:
-    def __init__(self):
+    def __init__(self, pubmed_id):
+        self.pubmed_id = pubmed_id
         self.email = "garzaguk@cs.man.ac.uk"
-        users_object = UsersDb()
-        self.users = users_object.getRows()
-        people_object = PeopleDb()
-        self.people = people_object.getRows()
+        # users_object = UsersDb()
+        self.users = UserTableView().view
+        # people_object = PeopleDb()
+        self.people = TableView("people").view
         self.db = globalDB
-        relations_object = RelationsDb()
-        self.relations = relations_object.getRows()
-        publications_object = PublicationsDb()
-        self.publications = publications_object.getRows()
+        # relations_object = RelationsDb()
+        self.relations = TableView("relationships").view
+        # publications_object = PublicationsDb()
+        self.publications = TableView("publications").view
         self.model_view = ModelTableView()
         self.assets = AssetsView().assets
 
-    def get_used_items(self, pubmed_id):
+    def get_quantity_used_items(self):
         """
 
         :type pubmed_id: basestring
@@ -84,25 +89,29 @@ class Publication:
             if resource_type == 4:
                 return "DataFile"
 
-        contributors_ids = self.ask_pubmed_authors(pubmed_id)
-        users = UserTableView(self.db.users)
-        contributors_disciplines = users.view[users.view.id.isin(contributors_ids)]
-        involved_disciplines = contributors_disciplines.drop_duplicates(cols='discipline_id')
-        involved_disciplines['resource_type'] = involved_disciplines.apply(lambda row: windchill(row["discipline_id"]), axis=1)
-        return involved_disciplines
+        contributors_ids = self.get_authors()
+        users = UserTableView()
+        contributors = users.view[users.view.id.isin(contributors_ids)]
 
-    def ask_pubmed_authors(self, pubmed_id):
+        involved_disciplines = contributors.drop_duplicates(cols=['discipline_id', 'institution_id'])
+        involved_disciplines['resource_type'] = involved_disciplines.apply(lambda row: windchill(row["discipline_id"]),
+                                                                           axis=1)
+        return involved_disciplines[['discipline_id', 'institution_id', 'resource_type']]
+
+    def get_authors(self):
         """
 
         :param pubme_ids:
         """
         pubmed_object = PubmedSearcher(self.email)
-        names = pubmed_object.get_authors_list(pubmed_id)
+        names = pubmed_object.get_authors_list(self.pubmed_id)
+        self.users["contributor_id"] = self.users["id"]
         concatenated = pandas.DataFrame.merge(self.users, self.people, how='left', left_on='person_id', right_on='id',
                                               left_index=False, right_index=False, sort=True,
                                               suffixes=('_x', '_y'), copy=True)
 
         filtered = concatenated[concatenated.last_name.isin(names["LastName"])]
+
         r = filtered["contributor_id"]
 
         if 0 == filtered.shape[0]:
@@ -111,15 +120,16 @@ class Publication:
         assert isinstance(r, pandas.Series)
         return r
 
-    def get_corpora(self, pubmed_id):
+    def get_corpora(self):
         """
         :param pubmed_id:
         :return:
         """
-        # publication = pandas.DataFrame.from_csv('/Users/kristian/Desktop/' + pubmed_id, sep='\t')
+        # publication = pandas.DataFrame.from_csv('/Users/kristian/Desktop/' + self.pubmed_id, sep='\t')
 
 
-        handle = efetch(db='pubmed', id=pubmed_id, retmode='text', rettype='abstract', email='garzaguk@.cs.man.ac.uk')
+        handle = efetch(db='pubmed', id=self.pubmed_id, retmode='text', rettype='abstract',
+                        email='garzaguk@.cs.man.ac.uk')
         text = handle.read()
 
         terms = TermsBag()
@@ -127,7 +137,7 @@ class Publication:
         publication = terms.to_data_frame()
 
         #
-        # text = open('/Users/kristian/Desktop/' + pubmed_id + "m")
+        # text = open('/Users/kristian/Desktop/' + self.pubmed_id + "m")
         #
         # terms = TermsBag()
         # terms.termine_service(text.read())
@@ -137,24 +147,25 @@ class Publication:
         assert isinstance(publication, pandas.DataFrame)
         return publication
 
-    def get_data_sharing_ratio(self, pubmed_id):
+    def get_data_sharing_ratio(self):
         """
 
         :type pubmed_id: basestring
         """
-        used_items = self.get_used_items(pubmed_id)
-        shared_items = self.get_data_available(pubmed_id)
-        print(shared_items.shape[0])
-        print(used_items.shape[0])
-        print("DS Ratio:", (shared_items.shape[0] / used_items.shape[0]))
-        print(shared_items)
+        used_items = self.get_quantity_used_items()
+        shared_items = self.get_data_available()
+        # print(shared_items.shape[0])
+        # print(used_items.shape[0])
+        # print("DS Ratio:", (shared_items.shape[0] / used_items.shape[0]))
+        # print(shared_items)
+        r = (shared_items.shape[0] / used_items.shape[0])
         # def get_used_items(self,pubmed_id):
         # authors = self.ask_publication_authors(self, pubmed_id)
         # authors
-        return shared_items
+        return r
 
-    def get_data_available(self, pubmed_id):
-        contributor_ids = self.ask_pubmed_authors(pubmed_id)
+    def get_data_available(self):
+        contributor_ids = self.get_authors()
         # filtered = self.assets[self.assets.contributor_id.isin(contributor_ids)]
         # self.model_view.get_terms_db(filtered["id"])
         # descriptions = self.assets[self.assets.contributor_id.isin(contributor_ids)]
@@ -162,11 +173,11 @@ class Publication:
         self.model_view.get_terms_db(filtered["id"])
         descriptions = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
         # # descriptions = self.get_descriptions(contributors_ids)
-        publications = self.get_corpora(pubmed_id)
-        shared_items = self.get_matching_terms(descriptions, publications)
+        publications = self.get_corpora()
+        shared_items = self.__get_matching_terms(descriptions, publications)
         return shared_items
 
-    def get_matching_terms(self, descriptions, publication):
+    def __get_matching_terms(self, descriptions, publication):
 
         descriptions['no_similar_terms'] = 0
         compared2 = 0
@@ -200,10 +211,10 @@ class Publication:
 
         return compared2
 
-    def get_efficiency_coeff(self, pubmed_id, asset_ids):
+    def get_efficiency_coeff(self, asset_ids):
         r = 0
 
-        publication = self.publications[self.publications.pubmed_id.isin([int(pubmed_id)])]
+        publication = self.publications[self.publications.pubmed_id.isin([int(self.pubmed_id)])]
         pubmed_id_relations = self.relations[self.relations.object_id.isin(publication["id"])]
         pubmed_id_relations = pubmed_id_relations[pubmed_id_relations["subject_type"] == "Model"]
         # pubmed_id_relations = pubmed_id_relations[pubmed_id_relations["subject_type"] == "DataFile"]
@@ -224,7 +235,7 @@ class Publication:
         try:
             precision = true_positives / (true_positives + false_positives)
             recall = true_positives / (true_positives + false_negatives)
-            r = [{'pubmed_id': pubmed_id, 'recall': recall, 'precision': precision}]
+            r = [{'pubmed_id': self.pubmed_id, 'recall': recall, 'precision': precision}]
         except ZeroDivisionError:
             print "Oops!  ZeroDivisionError  Try again..."
         else:
@@ -233,21 +244,21 @@ class Publication:
 
         return r
 
-    def get_recall(self, pubmed_id):
+    def get_recall(self):
         r = 0
         try:
-            # contributor_ids = self.ask_pubmed_authors(pubmed_id)
+            # contributor_ids = self.ask_pubmed_authors(self.pubmed_id)
             #
             # filtered = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
             # self.model_view.get_terms_db(filtered["id"])
             # descriptions = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
             #
-            # publications = self.get_corpora(pubmed_id)
+            # publications = self.get_corpora(self.pubmed_id)
             # compared = self.get_matching_terms(descriptions, publications)
 
-            compared = self.get_data_available(pubmed_id)
+            compared = self.get_data_available()
 
-            r = self.get_efficiency_coeff(pubmed_id, compared["id"])
+            r = self.get_efficiency_coeff(compared["id"])
         except TypeError:
             print("TypeError")
         return r
@@ -255,7 +266,7 @@ class Publication:
 
 class ModelTableView:
     def __init__(self):
-    # def __init__(self, table_object):
+        # def __init__(self, table_object):
         db = globalDB
         # self.table_object = table_object
         s = db.execute("SELECT models.model_type_id, models.contributor_type, models.id, models.contributor_id, models.title, models.description, \
@@ -280,15 +291,21 @@ class ModelTableView:
 
 
 class UserTableView:
-    def __init__(self, table_object):
-        self.table_object = table_object
+    def __init__(self):
+        # self.table_object = table_object
         self.db = globalDB
-        s = self.db.execute("SELECT users.*, disciplines_people.discipline_id \
+        s = self.db.execute("SELECT users.*, disciplines_people.discipline_id, group_memberships.work_group_id, \
+            work_groups.institution_id \
             FROM users \
             LEFT JOIN disciplines_people \
-            ON disciplines_people.person_id = users.person_id;")
+            ON disciplines_people.person_id = users.person_id \
+            LEFT JOIN group_memberships \
+            ON group_memberships.person_id = users.person_id \
+            LEFT JOIN work_groups \
+            ON work_groups.id = group_memberships.work_group_id;")
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
+
 
 class ProjectSubsTableView:
     def __init__(self):
@@ -320,23 +337,24 @@ class Project:
 
     def get_sharing_ratio(self, id):
         b = AssetsView()
+
         def lala(id):
             print id
             b = Asset(id["asset_id"])
             return b.get_permission_label()
+
         b.assets = b.assets[b.assets["project_id"] == id]
         b.assets['label'] = ""
-        b.assets['label'] = b.assets.apply(lambda row:lala(row), axis=1)
-        grpA  = b.assets.groupby('project_id')
-    # for i in list([1,2,3,5,6,8,9,10,11,12,14,15]):
+        b.assets['label'] = b.assets.apply(lambda row: lala(row), axis=1)
+        grpA = b.assets.groupby('project_id')
+        # for i in list([1,2,3,5,6,8,9,10,11,12,14,15]):
         project = grpA.get_group(id)
         total = len(project)
         open = len(project[project["label"] == 'open'])
         intra = len(project[project["label"] == 'intra'])
         inter = len(project[project["label"] == 'inter'])
-        ratio = (intra+open+inter)/total
+        ratio = (intra + open + inter) / total
         return ratio
-
 
 
 class ProjectTableView:
@@ -351,12 +369,14 @@ class ProjectTableView:
         members = subscriptions.view[subscriptions.view["project_id"] == id]
         return members["person_id"]
 
+
 class DataFilesProjectsTableView:
     def __init__(self):
         self.db = globalDB
         s = self.db.execute("SELECT * FROM data_files_projects")
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
+
 
 class AssetsTableView:
     def __init__(self):
@@ -365,42 +385,44 @@ class AssetsTableView:
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
 
+
 class AssetsView:
     def __init__(self):
         self.db = globalDB
         model_view = modelTableView
         data_view = dataTableView
         df1 = model_view.view[["title", "description", "contributor_id", "type_title", "id", 'project_id']]
-        df2 = data_view.view[['title', 'description', 'contributor_id', 'id','project_id']]
+        df2 = data_view.view[['title', 'description', 'contributor_id', 'id', 'project_id']]
         df1['resource_type'] = 'Model'
         df2['resource_type'] = 'DataFile'
         self.assets = pandas.concat([df2, df1], ignore_index=True)
-        self.assets['asset_id'] = range(1, len(self.assets)+1)
+        self.assets['asset_id'] = range(1, len(self.assets) + 1)
         model_auth_view = TableView("model_auth_lookup")
         data_auth_view = TableView("data_file_auth_lookup")
         df1 = model_auth_view.view
         df2 = data_auth_view.view
         df1['resource_type'] = 'Model'
         df2['resource_type'] = 'DataFile'
-        df1 = df1.rename(columns = {'asset_id':'id'})
+        df1 = df1.rename(columns={'asset_id': 'id'})
         m = self.assets[self.assets["resource_type"] == "Model"]
-        merge_models = pandas.DataFrame.merge(df1, m[list(['id','asset_id'])], how='left', on='id',
-            left_index=True, right_index=False, sort=False,
-            suffixes=('_x', '_y'), copy=False)
-        df2 = df2.rename(columns = {'asset_id':'id'})
+        merge_models = pandas.DataFrame.merge(df1, m[list(['id', 'asset_id'])], how='left', on='id',
+                                              left_index=True, right_index=False, sort=False,
+                                              suffixes=('_x', '_y'), copy=False)
+        df2 = df2.rename(columns={'asset_id': 'id'})
         m = self.assets[self.assets["resource_type"] == "DataFile"]
-        merge_datafiles = pandas.DataFrame.merge(df2, m[list(['id','asset_id'])], how='left', on='id',
-                                      left_index=True, right_index=False, sort=True,
-                                      suffixes=('_x', '_y'), copy=False)
+        merge_datafiles = pandas.DataFrame.merge(df2, m[list(['id', 'asset_id'])], how='left', on='id',
+                                                 left_index=True, right_index=False, sort=True,
+                                                 suffixes=('_x', '_y'), copy=False)
 
         self.permissions = pandas.concat([merge_datafiles, merge_models], ignore_index=True)
+
 
 class Asset:
     def __init__(self, id):
         self.id = id
-    #
-    #
-    # def get_info(self):
+        #
+        #
+        # def get_info(self):
         a = assetsView
         self.info = a.assets[a.assets["asset_id"] == self.id]
         self.access = ""
@@ -420,20 +442,20 @@ class Asset:
         # access = self.permissions[self.permissions["can_download"] == 1]
         access = self.permissions[self.permissions["can_view"] == 1]
 
-        access = self.remove_sysmodb_permissions(access)
+        access = self.__remove_sysmodb_permissions(access)
 
-        self.access = self.is_open(access)
+        self.access = self.__is_open(access)
 
         if not self.access:
-            self.access = self.is_intra(access)
+            self.access = self.__is_intra(access)
         if not self.access:
-            self.access = self.is_partial_intra(access)
+            self.access = self.__is_partial_intra(access)
         if not self.access:
-            self.access = self.is_private(access)
+            self.access = self.__is_private(access)
         if not self.access:
-            self.access = self.is_inter(access)
+            self.access = self.__is_inter(access)
         if not self.access:
-            self.access = self.is_ext_private(access)
+            self.access = self.__is_ext_private(access)
 
         # print "lolo"
         # print access
@@ -443,20 +465,20 @@ class Asset:
 
 
     @staticmethod
-    def is_open(permissions):
+    def __is_open(permissions):
         r = permissions[permissions.user_id.isin([0])]
-        if r.shape[0] :
+        if r.shape[0]:
             return "open"
         return ""
 
     @staticmethod
-    def is_private(permissions):
+    def __is_private(permissions):
         if permissions.shape[0] == 1 and len(permissions[permissions["can_delete"] == 1]) > 0:
             return "private"
         return ""
 
     @staticmethod
-    def is_ext_private(permissions):
+    def __is_ext_private(permissions):
 
         # print permissions
         if len(permissions[permissions["can_delete"] == 1]) > 0:
@@ -464,37 +486,36 @@ class Asset:
         return ""
 
 
-    def is_intra(self, permissions):
+    def __is_intra(self, permissions):
         projects = Project()
         project_members = projects.get_members(self.project)
 
-        if set(permissions["user_id"]).issubset( set(project_members) ) and \
-                len(permissions["user_id"]) == len(project_members):
+        if set(permissions["user_id"]).issubset(set(project_members)) and \
+                        len(permissions["user_id"]) == len(project_members):
             return "intra"
         return ""
 
-    def is_partial_intra(self, permissions):
+    def __is_partial_intra(self, permissions):
         projects = Project()
         project_members = projects.get_members(self.project)
 
         # print permissions["user_id"]
         # print project_members
 
-        if set(permissions["user_id"]).issubset( set(project_members) ):
+        if set(permissions["user_id"]).issubset(set(project_members)):
             return "partial_intra"
         return ""
 
-    def is_inter(self, permissions):
+    def __is_inter(self, permissions):
         projects = Project()
         project_members = projects.get_members(self.project)
 
-        if set(permissions["user_id"]).issuperset( set(project_members) ):
+        if set(permissions["user_id"]).issuperset(set(project_members)):
             return "inter"
         return ""
 
-    def remove_sysmodb_permissions(self, permissions):
+    def __remove_sysmodb_permissions(self, permissions):
         if self.project != 12:
-            print "lalaa"
             projects = Project()
             sysmodb_members = projects.get_members(12)
             permissions = permissions[~permissions.user_id.isin(sysmodb_members)]
@@ -507,6 +528,7 @@ class TableView:
         s = self.db.execute("SELECT * FROM " + table_name)
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
+
 
 class Model(Asset):
     def __init__(self, id):
@@ -529,8 +551,10 @@ class Model(Asset):
         return self.data["asset_id"]
 
     def get_terms(self):
-        self.data["terms"] = TermsBag().termine_service(str(self.data['title'] + ". " + self.data['description'] + " . " + str(self.data['type_title'])))
+        self.data["terms"] = TermsBag().termine_service(
+            str(self.data['title'] + ". " + self.data['description'] + " . " + str(self.data['type_title'])))
         return self.data["terms"]
+
 
 class TermsBag:
     def __init__(self, text=" "):
