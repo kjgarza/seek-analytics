@@ -102,8 +102,8 @@ def permissions():
     print(a)
     return 'PASS!'
 
-@app.route('/test_AssetsView')
-def permissions2():
+@app.route('/write_label')
+def write_label():
     a = AssetsView()
 
     def lala(id):
@@ -111,28 +111,71 @@ def permissions2():
         b = Asset(id["asset_id"])
         return b.get_permission_label()
 
+
+
     a.assets['label'] = ""
     a.assets['label'] = a.assets.apply(lambda row:lala(row), axis=1)
 
+    a.assets = a.assets[a.assets['resource_type'] == 'Model']
 
-    plt.figure()
-    # plot = rplot.RPlot(a.assets, x='', y='')
-    # plot.add(rplot.TrellisGrid(['project_id', 'access']))
-    # plot.add(rplot.GeomHistogram())
-    # plot.render(plt.gcf())
-    #
-    a.assets.diff().hist(color='k', alpha=0.5)
+    dt = MyDbTable()
+    a.assets.apply(lambda row: dt.update(row['label'], row['id']), axis=1)
+
+    dt.close_con()
 
     return 'PASS!'
     # return render_template("analysis.html", name="lol", data=a.assets.to_html())
 
-@app.route('/get_sharing_ratio')
-def get_sharing_ratio():
-    p = Publication("22607453")
-    p.get_data_sharing_ratio()
+@app.route('/write_terms')
+def write_terms():
+    a = AssetsView()
 
+    def lala(id):
+        print id
+        b = Asset(id["asset_id"])
+        return b.get_terms()
+
+
+    a.assets = a.assets[900:]
+
+    a.assets = a.assets[a.assets['resource_type'] == 'Model']
+
+
+    a.assets['terms'] = ""
+    a.assets['terms'] = a.assets.apply(lambda row:lala(row), axis=1)
+
+
+    dt = MyDbTable()
+    a.assets.apply(lambda row: dt.update(row['terms'], row['id']), axis=1)
+
+    dt.close_con()
 
     return 'PASS!'
+
+
+@app.route('/test_get_sharing_ratio')
+def test_get_sharing_ratio():
+    p = Publication("22607453")
+    if p.get_data_sharing_ratio():
+        r = 'PASS!'
+    else:
+        r = 'FAIL!!!!!!!!!!!!!'
+    return r
+
+@app.route('/fill_sharing_ratio')
+def fill_sharing_ratio():
+    pbls = PublicationView()
+    pbls.fill_ds_ratio()
+    grouped = pbls.groupby('project_id')
+    print grouped['ds_ratio'].agg([np.sum, np.mean, np.std])
+
+    if isinstance(pbls, pandas.DataFrame):
+        r = 'PASS!'
+    else:
+        r = 'FAIL!!!!!!!!!!!!!'
+    return r
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

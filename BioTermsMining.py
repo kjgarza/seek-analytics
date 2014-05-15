@@ -12,6 +12,10 @@ from Bio.Entrez import efetch
 import sets
 from sqlsoup import Session
 from datetime import *
+import MySQLdb
+import pandas.io.sql as psql
+import unidecode
+
 
 globalDB = sqlsoup.SQLSoup('mysql+mysqldb://root:@127.0.0.1/sysmo?charset=ascii')
 
@@ -39,10 +43,11 @@ class DataTableView:
 
 
 class PublicationView:
-    def __init__(self, table_object):
+    def __init__(self):
         db = globalDB
-        self.table_object = table_object
-        s = db.execute("SELECT * FROM publications")
+        s = db.execute("SELECT * FROM publications \
+            LEFT JOIN projects_publications \
+            ON projects_publications.publication_id = publications.id;")
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
         self.view["terms"] = ""
@@ -53,12 +58,14 @@ class PublicationView:
             lambda row: TermsBag().termine_service(row['title'] + ". " + row['description']), axis=1)
 
     def fill_ds_ratio(self):
-        self.view["ds_ration"] = 0.0
-        self.view.ds_ration.apply(lambda row: Publication(row["pubmed_id"]).get_data_sharing_ratio(), axis=1)
+        self.view["ds_ratio"] = 0.0
+        self.view["ds_ratio"] = self.view.apply(lambda row: Publication(str(int(row["pubmed_id"]))).get_data_sharing_ratio(), axis=1)
 
 
 class Publication:
     def __init__(self, pubmed_id):
+        if not isinstance(pubmed_id, str):
+            raise TypeError("bar must be set to an string")
         self.pubmed_id = pubmed_id
         self.email = "garzaguk@cs.man.ac.uk"
         # users_object = UsersDb()
@@ -70,8 +77,8 @@ class Publication:
         self.relations = TableView("relationships").view
         # publications_object = PublicationsDb()
         self.publications = TableView("publications").view
-        self.model_view = ModelTableView()
-        self.assets = AssetsView().assets
+        self.model_view = modelTableView
+        self.assets = assetsView
 
     def get_quantity_used_items(self):
         """
@@ -154,11 +161,37 @@ class Publication:
         """
         used_items = self.get_quantity_used_items()
         shared_items = self.get_data_available()
+
+        used_models = len((used_items[used_items["resource_type"] == 'Model'])['institution_id'].unique())
+        used_files = len((used_items[used_items["resource_type"] == 'DataFile'])['institution_id'].unique())
+
+        print (used_items[used_items["resource_type"] == 'Model'])['institution_id'].unique()
+        print used_models
+
+        ava_models = len(shared_items[shared_items["resource_type"] == 'Model'])
+        ava_files =len(shared_items[shared_items["resource_type"] == 'DataFile'])
+
+        if not used_models:
+            m = 0
+        else:
+            m = ava_models/used_models
+        if not used_files:
+            d = 0
+        else:
+            d = ava_files/used_files
+
+
+        r = (m+d)/2
+
+        print used_items
+        print "----:)"
+        print shared_items
+
         # print(shared_items.shape[0])
         # print(used_items.shape[0])
         # print("DS Ratio:", (shared_items.shape[0] / used_items.shape[0]))
         # print(shared_items)
-        r = (shared_items.shape[0] / used_items.shape[0])
+        # r = (shared_items.shape[0] / used_items.shape[0])
         # def get_used_items(self,pubmed_id):
         # authors = self.ask_publication_authors(self, pubmed_id)
         # authors
@@ -166,19 +199,31 @@ class Publication:
 
     def get_data_available(self):
         contributor_ids = self.get_authors()
-        # filtered = self.assets[self.assets.contributor_id.isin(contributor_ids)]
+
+        filtered = self.assets.assets[self.assets.assets.contributor_id.isin(contributor_ids)]
+
+        filtered['label'] = ""
+        filtered['label'] = filtered.apply(lambda row: Asset(row["asset_id"]).get_permission_label(), axis=1)
+        filtered = filtered[filtered['label'] == 'open']
+
+
+        filtered["terms"] = filtered.apply(lambda row: Asset(row['asset_id']).get_terms(), axis=1)
+        # print filtered["terms"]
+        descriptions = filtered
+
+        # filtered = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
         # self.model_view.get_terms_db(filtered["id"])
-        # descriptions = self.assets[self.assets.contributor_id.isin(contributor_ids)]
-        filtered = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
-        self.model_view.get_terms_db(filtered["id"])
-        descriptions = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
+        # descriptions = self.model_view.view[self.model_view.view.contributor_id.isin(contributor_ids)]
         # # descriptions = self.get_descriptions(contributors_ids)
         publications = self.get_corpora()
         shared_items = self.__get_matching_terms(descriptions, publications)
         return shared_items
 
     def __get_matching_terms(self, descriptions, publication):
-
+        if not isinstance(descriptions, pandas.DataFrame):
+            raise TypeError("descriptions must be set to an pandas.DataFrame")
+        if not isinstance(publication, pandas.DataFrame):
+            raise TypeError("publication must be set to an pandas.DataFrame")
         descriptions['no_similar_terms'] = 0
         compared2 = 0
 
@@ -212,6 +257,8 @@ class Publication:
         return compared2
 
     def get_efficiency_coeff(self, asset_ids):
+        if not isinstance(asset_ids, pandas.DataFrame):
+            raise TypeError("asset_ids must be set to an pandas.DataFrame")
         r = 0
 
         publication = self.publications[self.publications.pubmed_id.isin([int(self.pubmed_id)])]
@@ -285,6 +332,7 @@ class ModelTableView:
 
 
     def get_terms_db(self, ids):
+        print ids
         self.view.terms[self.view.id.isin(ids)] = self.view[self.view.id.isin(ids)].apply(
             lambda row: TermsBag().termine_service(
                 row['title'] + ". " + row['description'] + " . " + str(row['type_title'])), axis=1)
@@ -294,11 +342,11 @@ class UserTableView:
     def __init__(self):
         # self.table_object = table_object
         self.db = globalDB
-        s = self.db.execute("SELECT users.*, disciplines_people.discipline_id, group_memberships.work_group_id, \
+        s = self.db.execute("SELECT users.*, disciplines_people_copy.discipline_id, group_memberships.work_group_id, \
             work_groups.institution_id \
             FROM users \
-            LEFT JOIN disciplines_people \
-            ON disciplines_people.person_id = users.person_id \
+            LEFT JOIN disciplines_people_copy \
+            ON disciplines_people_copy.person_id = users.person_id \
             LEFT JOIN group_memberships \
             ON group_memberships.person_id = users.person_id \
             LEFT JOIN work_groups \
@@ -521,6 +569,19 @@ class Asset:
             permissions = permissions[~permissions.user_id.isin(sysmodb_members)]
         return permissions
 
+    def get_terms(self):
+        r = self.info.to_records()
+        # print r
+        terms = ""
+        print r['resource_type']
+        if str(r['resource_type']) == '[Model]':
+            terms = TermsBag().termine_service(str(r['title'] + ". " + r['description'] + " . " + str(r['type_title'])))
+        elif str(r['resource_type']) == '[DataFile]':
+            terms = TermsBag().termine_service(str(r['title'] + ". " + r['description']))
+        else:
+            print "Missing resource ID"
+        return terms
+
 
 class TableView:
     def __init__(self, table_name):
@@ -565,14 +626,19 @@ class TermsBag:
         port = termineLocator().gettermine_porttype()
         req = analyze_request()
         print ".."
-        # print text
-        decoded_str = text.decode('ISO-8859-1')
+        print text
+        # decoded_str = text.decode('Latin1')
+        # encoded_str = decoded_str.encode('ascii', 'replace')
+        decoded_str = unidecode.unidecode(text)
         encoded_str = decoded_str.encode('ascii', 'replace')
 
         req._src = encoded_str
         res = port.analyze(req)
         self.text = res._result
         return res._result
+
+    def __unicode__(self):
+        return unicode(self.some_field) or u''
 
     def to_data_frame(self):
         list_terms = self.text.encode('ascii', 'ignore').split('\n')
@@ -584,9 +650,27 @@ class TermsBag:
         return df_terms
 
     def compare_with(self, terms_bag):
-        self.to_data_frame(self.text)
+        self.to_data_frame()
         similarly = self.terms[self.terms.terms.isin(terms_bag.terms)]
         return similarly
+
+class MyDbTable:
+    def __init__(self):
+
+        self.db = MySQLdb.connect("127.0.0.1","root","","sysmo")
+        self.cursor = self.db.cursor()
+
+    def update(self, value, id):
+        self.cursor.execute("""
+           UPDATE models_copy
+           SET label=%s
+           WHERE id=%s
+        """, (value, id))
+
+
+    def close_con(self):
+        self.db.commit()
+        self.db.close()
 
 
 dataTableView = DataTableView()
