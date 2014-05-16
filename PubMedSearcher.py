@@ -1,6 +1,9 @@
 import calendar
 import pandas
 from unidecode import unidecode
+import unicodedata
+import chardet
+
 
 from Bio import Entrez
 
@@ -180,7 +183,20 @@ class PubmedSearcher:
         handle.close()
         r = pandas.DataFrame.from_dict(record['MedlineCitation']['Article']['AuthorList'])
 
-        r['LastName'].apply(lambda row: unidecode(row.encode('utf-8')))
+        def remove_accents(input_str):
+            print type(input_str)
+            if type(input_str) != Entrez.Parser.UnicodeElement:
+                input_str = str(input_str)
+                result = chardet.detect(input_str)
+                charenc = result['encoding']
+                input_str = input_str.decode(charenc)
+            nkfd_form = unicodedata.normalize('NFKD', input_str)
+            return u"".join([c for c in nkfd_form if not unicodedata.combining(c)])
+
+
+
+        # r['LastName'].apply(lambda row: unidecode((str(row)).encode('utf-8')))
+        r['LastName'].apply(lambda row: remove_accents(row))
         return r
 
 

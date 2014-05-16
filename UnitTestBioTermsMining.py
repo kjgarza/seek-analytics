@@ -2,6 +2,7 @@ from __future__ import division
 from BioTermsMining import *
 import pandas.tools.rplot as rplot
 import matplotlib.pyplot as plt
+import numpy as np
 
 from flask import Flask, render_template
 app = Flask(__name__)
@@ -26,12 +27,12 @@ def permissions2():
     def lala(id):
         print id
         b = Asset(id["asset_id"])
-        return b.get_permission_label()
+        return b.get_permission_label("download")
 
 
 
-    a.assets['label'] = ""
-    a.assets['label'] = a.assets.apply(lambda row:lala(row), axis=1)
+    a.assets['access'] = ""
+    a.assets['access'] = a.assets.apply(lambda row:lala(row), axis=1)
 
 
     return 'PASS!'
@@ -44,8 +45,7 @@ def test_get_sharing_ratio():
     p = Publication("22607453")
     s = p.get_data_sharing_ratio()
     if s:
-        print s
-        r = 'PASS!'
+        return render_template("analysis.html", name='PASS!', data=s)
     else:
         r = 'FAIL!!!!!!!!!!!!!'
     return r
@@ -54,11 +54,12 @@ def test_get_sharing_ratio():
 def fill_sharing_ratio():
     pbls = PublicationView()
     pbls.fill_ds_ratio()
-    grouped = pbls.groupby('project_id')
-    print grouped['ds_ratio'].agg([np.sum, np.mean, np.std])
-
+    grouped = pbls.view.groupby('project_id')
+    # print grouped.view
+    print grouped['ds_ratio'].agg([np.median, np.mean, np.std])
+    x = grouped['ds_ratio'].agg([np.median, np.mean, np.std])
     if isinstance(pbls, pandas.DataFrame):
-        r = 'PASS!'
+        return render_template("analysis.html", name='PASS!', data=pbls.view)
     else:
         r = 'FAIL!!!!!!!!!!!!!'
     return r
@@ -74,10 +75,10 @@ def assets_test():
     def lala(id):
         print id
         b = Asset(id["asset_id"])
-        return b.get_permission_label()
+        return b.get_permission_label("download")
 
-    b.assets['label'] = ""
-    b.assets['label'] = b.assets.apply(lambda row:lala(row), axis=1)
+    b.assets['access'] = ""
+    b.assets['access'] = b.assets.apply(lambda row:lala(row), axis=1)
 
     # r = b.assets.groupby(['project_id','label']).agg([len])
 
@@ -89,9 +90,9 @@ def assets_test():
     # for i in list([1,2,3,5,8,14]):
         project = grpA.get_group(i)
         total = len(project)
-        open = len(project[project["label"] == 'open'])
-        intra = len(project[project["label"] == 'intra'])
-        inter = len(project[project["label"] == 'inter'])
+        open = len(project[project["access"] == 'open'])
+        intra = len(project[project["access"] == 'intra'])
+        inter = len(project[project["access"] == 'inter'])
         ratio = (intra+open+inter)/total
         # print i+": "
         print ratio

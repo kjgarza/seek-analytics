@@ -102,29 +102,24 @@ def permissions():
     print(a)
     return 'PASS!'
 
-@app.route('/write_label')
-def write_label():
+@app.route('/write_access/<resource_type>')
+def write_label(resource_type):
     a = AssetsView()
-
     def lala(id):
         print id
         b = Asset(id["asset_id"])
-        return b.get_permission_label()
+        return b.get_permission_label("download")
 
-
-
-    a.assets['label'] = ""
-    a.assets['label'] = a.assets.apply(lambda row:lala(row), axis=1)
-
-    a.assets = a.assets[a.assets['resource_type'] == 'Model']
-
+    a.assets['access'] = a.assets.apply(lambda row:lala(row), axis=1)
+    a.assets = a.assets[a.assets['resource_type'] == resource_type]
     dt = MyDbTable()
-    a.assets.apply(lambda row: dt.update(row['label'], row['id']), axis=1)
 
+    if resource_type == 'Model':
+        a.assets.apply(lambda row: dt.update_model_access(row['access'], row['id']), axis=1)
+    if resource_type == 'DataFile':
+        a.assets.apply(lambda row: dt.update_datafile_access(row['access'], row['id']), axis=1)
     dt.close_con()
-
-    return 'PASS!'
-    # return render_template("analysis.html", name="lol", data=a.assets.to_html())
+    return render_template("analysis.html", name="write_access", data=a.assets.to_html())
 
 @app.route('/write_terms')
 def write_terms():
