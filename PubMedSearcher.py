@@ -199,6 +199,13 @@ class PubmedSearcher:
         r['LastName'].apply(lambda row: remove_accents(row))
         return r
 
+    def get_auths_pubs(self, auths):
+        handle = Entrez.esearch(db="pubmed",term="Bekker M [AU]")
+        record = Entrez.read(handle)
+        return record["IdList"]
+
+
+
 
 # from Bio.Entrez import efetch
 #

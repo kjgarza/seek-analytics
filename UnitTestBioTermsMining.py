@@ -57,12 +57,22 @@ def fill_sharing_ratio():
     grouped = pbls.view.groupby('project_id')
     # print grouped.view
     print grouped['ds_ratio'].agg([np.median, np.mean, np.std])
-    x = grouped['ds_ratio'].agg([np.median, np.mean, np.std])
     if isinstance(pbls, pandas.DataFrame):
         return render_template("analysis.html", name='PASS!', data=pbls.view)
     else:
         r = 'FAIL!!!!!!!!!!!!!'
     return r
+
+
+@app.route('/use_stats')
+def use_stats():
+    u =UserTableView()
+    u.fill_sharing_ratio()
+
+    alfa = u.view.groupby('project_id')
+    print alfa['ds_ratio'].agg([np.median, np.mean, np.std])
+    a = u.view
+    return render_template("analysis.html", name="write_access", data=a.to_html())
 
 
 

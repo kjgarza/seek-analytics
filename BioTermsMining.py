@@ -1,9 +1,4 @@
 from __future__ import division
-from DataFilesDb import DataFilesDb
-from RelationsDb import RelationsDb
-from PublicationsDb import PublicationsDb
-from PeopleDb import PeopleDb
-from UsersDb import UsersDb
 from PubMedSearcher import PubmedSearcher
 import pandas
 import sqlsoup
@@ -45,14 +40,12 @@ class DataTableView:
 class PublicationView:
     def __init__(self):
         db = globalDB
-        s = db.execute("SELECT * FROM publications \
+        s = db.execute("SELECT * FROM publications_copy \
             LEFT JOIN projects_publications \
-            ON projects_publications.publication_id = publications.id;")
+            ON projects_publications.publication_id = publications_copy.id;")
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
         self.view = self.view[self.view['pubmed_id'].notnull()]
-        # blacklist = ["18974823",'23766111','19954172']
-        # self.view = self.view[10:30]
         self.view["terms"] = ""
         self.terms = 0
 
@@ -120,11 +113,14 @@ class Publication:
         """
         pubmed_object = PubmedSearcher(self.email)
         names = pubmed_object.get_authors_list(self.pubmed_id)
-        self.users["contributor_id"] = self.users["id"]
-        concatenated = pandas.DataFrame.merge(self.users, self.people, how='left', left_on='person_id', right_on='id',
-                                              left_index=False, right_index=False, sort=True,
-                                              suffixes=('_x', '_y'), copy=True)
+        # self.users["contributor_id"] = self.users["id"]
+        # concatenated = pandas.DataFrame.merge(self.users, self.people, how='left', left_on='person_id', right_on='id',
+        #                                       left_index=False, right_index=False, sort=True,
+        #                                       suffixes=('_x', '_y'), copy=True)
 
+
+        concatenated = self.users
+        concatenated["contributor_id"] = concatenated["id"]
         filtered = concatenated[concatenated.last_name.isin(names["LastName"])]
 
         r = filtered["contributor_id"]
@@ -181,22 +177,36 @@ class Publication:
         used_files = len((used_items[used_items["resource_type"] == 'DataFile'])['institution_id'].unique())
 
 
-        print shared_items
+        # print shared_items
 
         ava_models = len(shared_items[shared_items["resource_type"] == 'Model'])
         ava_files =len(shared_items[shared_items["resource_type"] == 'DataFile'])
 
         if not used_models:
             m = 0
+        elif used_models < ava_models:
+            m = 1
         else:
             m = ava_models/used_models
         if not used_files:
             d = 0
+        elif used_files < ava_files:
+            d = 1
         else:
             d = ava_files/used_files
 
+        print m
+        print d
 
-        r = (m+d)/2
+        print used_models
+        print used_files
+
+
+        ### average of the ratios
+        r = (m+d)/(used_files/used_files + used_models/used_models)
+
+        ####ratio of the averages
+        # r = (ava_files + ava_models)/(used_files + used_models)
 
         # r = (shared_items.shape[0] / used_items.shape[0])
         return r
@@ -354,17 +364,68 @@ class UserTableView:
     def __init__(self):
         # self.table_object = table_object
         self.db = globalDB
-        s = self.db.execute("SELECT users.*, disciplines_people_copy.discipline_id, group_memberships.work_group_id, \
-            work_groups.institution_id \
+        s = self.db.execute("SELECT users.id, users.created_at, disciplines_people_copy.discipline_id,  \
+     work_groups.institution_id, project_subscriptions.project_id, group_memberships_project_roles.project_role_id, \
+     people.first_name, people.last_name, people.email, projects.name as project_name, project_roles.`name` as role \
             FROM users \
             LEFT JOIN disciplines_people_copy \
             ON disciplines_people_copy.person_id = users.person_id \
+            LEFT JOIN project_subscriptions \
+            ON project_subscriptions.person_id = users.person_id \
+            LEFT JOIN projects \
+            ON projects.id = project_subscriptions.project_id \
             LEFT JOIN group_memberships \
             ON group_memberships.person_id = users.person_id \
             LEFT JOIN work_groups \
-            ON work_groups.id = group_memberships.work_group_id;")
+            ON work_groups.id = group_memberships.work_group_id \
+            LEFT JOIN group_memberships_project_roles \
+            ON group_memberships_project_roles.group_membership_id = group_memberships.id \
+            LEFT JOIN people \
+            ON people.id = users.person_id \
+            LEFT JOIN project_roles\
+            ON project_roles.id = group_memberships_project_roles.project_role_id;")
         self.view = pandas.DataFrame(s.fetchall())
         self.view.columns = s.keys()
+        self.view = self.view[self.view["project_id"].notnull()]
+        self.view.fillna(0)
+        # self.view['tenure'] =self.view.apply(lambda row:(datetime(2013,01,31) - datetime(row['created_at'])), axis=1)
+
+    def fill_sharing_ratio(self):
+        self.view["ds_ratio"] = 0.0
+        self.view["ds_ratio"] = self.view.apply(lambda row: User(row["id"]).get_sharing_ratio(), axis=1)
+
+    def fill_number_assets(self):
+        self.view["no_assets"] = 0.0
+        self.view["no_assets"] = self.view.apply(lambda row: User(row["id"]).get_number_assets(), axis=1)
+
+    def fill_administrative_roles(self):
+        self.view["has_pal"] = 0
+        self.view["has_pal"] = self.view.apply(lambda row: User(row["id"]).has_pals(), axis=1)
+        self.view["has_coor"] = 0
+        self.view["has_coor"] = self.view.apply(lambda row: User(row["id"]).is_in_coordination_inst(), axis=1)
+
+    def remove_sysmodb(self):
+        project = Project(12)
+        sysmobd = project.get_members()
+        self.view = self.view[~self.view.id.isin(sysmobd)]
+
+    def remove_duplicated_joins(self):
+        self.view = self.view.drop_duplicates(["id", "discipline_id", "role"])
+        # work_groups.institution_id,
+
+    def reaffirm_pal(self):
+        pals = self.view[self.view["project_role_id"] == 6]
+        self.view.loc[self.view.id.isin(pals["id"]), 'role'] = "Sysmo-DB Pal"
+        self.view.loc[self.view.id.isin(pals["id"]), 'project_role_id'] = 6
+
+    def remove_newcollaborators(self):
+        self.view = self.view[self.view["created_at"] < datetime(2010, 1, 1)]
+
+    def cleaning_data(self):
+        self.view.loc[pandas.isnull(self.view["project_role_id"]), 'role'] = "Member"
+        self.view.loc[pandas.isnull(self.view["project_role_id"]), 'project_role_id'] = 1
+
+
 
 
 class ProjectSubsTableView:
@@ -380,14 +441,16 @@ class ProjectSubsTableView:
 
 
 class Project:
-    def __init__(self):
+    def __init__(self, id):
+        self.id = int(id)
         pass
 
-    def get_members(self, id):
+    def get_members(self):
         subs = ProjectSubsTableView()
         subscriptions = subs
 
-        members = subscriptions.view[subscriptions.view["project_id"] == id]
+
+        members = subscriptions.view[subscriptions.view["project_id"] == self.id]
 
         #Filter New Members
         members["created_at"] = pandas.to_datetime(members["created_at"])
@@ -395,26 +458,72 @@ class Project:
 
         return members["user_id"]
 
-    def get_sharing_ratio(self, id):
-        b = AssetsView()
+    def get_sharing_ratio(self):
+        b = assetsView
 
-        def lala(id):
-            print id
-            b = Asset(id["asset_id"])
-            return b.get_permission_label("download")
+        # def lala(id):
+        #     print id
+        #     b = Asset(id["asset_id"])
+        #     return b.get_permission_label("download")
 
-        b.assets = b.assets[b.assets["project_id"] == id]
-        b.assets['access'] = ""
-        b.assets['access'] = b.assets.apply(lambda row: lala(row), axis=1)
+        # b.assets = b.assets[b.assets["project_id"] == id]
+        # b.assets['access'] = ""
+        # b.assets['access'] = b.assets.apply(lambda row: lala(row), axis=1)
         grpA = b.assets.groupby('project_id')
-        # for i in list([1,2,3,5,6,8,9,10,11,12,14,15]):
-        project = grpA.get_group(id)
+
+        project = grpA.get_group(self.id)
         total = len(project)
         open = len(project[project["access"] == 'open'])
         intra = len(project[project["access"] == 'intra'])
+        # partial_intra = len(project[project["access"] == 'partial_intra'])
         inter = len(project[project["access"] == 'inter'])
+        ratio = (intra + open + inter ) / total
+        return ratio
+
+    def get_visibility_ratio(self):
+        b = assetsView
+
+        # def lala(id):
+        #     print id
+        #     b = Asset(id["asset_id"])
+        #     return b.get_permission_label("view")
+
+        # b.assets = b.assets[b.assets["project_id"] == id]
+        # b.assets['access'] = ""
+        # b.assets['access'] = b.assets.apply(lambda row: lala(row), axis=1)
+        grpA = b.assets.groupby('project_id')
+        # for i in list([1,2,3,5,6,8,9,10,11,12,14,15]):
+        project = grpA.get_group(self.id)
+        total = len(project)
+        open = len(project[project["label"] == 'open'])
+        intra = len(project[project["label"] == 'intra'])
+        partial_intra = len(project[project["label"] == 'partial_intra'])
+        inter = len(project[project["label"] == 'inter'])
         ratio = (intra + open + inter) / total
         return ratio
+
+    def get_coordinator(self):
+        m = self.get_members()
+        users = userTableView
+        mem = users.view[users.view.id.isin(m)]
+        c = mem[mem["project_role_id"] == 3]
+        if len(c):
+            r =  c
+        else:
+            r = False
+        return r
+
+    def get_pals(self):
+        m = self.get_members()
+        users = userTableView
+        mem = users.view[users.view.id.isin(m)]
+        c = mem[mem["project_role_id"] == 6]
+        if len(c) > 0:
+            r = c
+        else:
+            r = False
+        return r
+
 
 
 class ProjectTableView:
@@ -428,6 +537,11 @@ class ProjectTableView:
         subscriptions = TableView('project_subscriptions')
         members = subscriptions.view[subscriptions.view["project_id"] == id]
         return members["person_id"]
+
+    def fill_ds_ratio(self):
+        self.view["ds_ratio"] = 0.0
+        self.view["ds_ratio"] = self.view.apply(lambda row: Project(row['id']).get_sharing_ratio(), axis=1)
+
 
 
 class DataFilesProjectsTableView:
@@ -475,6 +589,80 @@ class AssetsView:
                                                  suffixes=('_x', '_y'), copy=False)
 
         self.permissions = pandas.concat([merge_datafiles, merge_models], ignore_index=True)
+
+
+class User:
+    def __init__(self, id):
+        assert (id, int)
+        self.id = id
+        table = userTableView
+        s = table.view[table.view["id"] == id]
+        if len(s) == 1:
+            self.data = (s).squeeze()
+        elif len(s[s.project_id.isin([12])]) > 0:
+            t = s[:1]
+            self.data = t.squeeze()
+        else:
+            t = s[:1]
+            self.data = t.squeeze()
+            print "this guy in many projects"
+
+
+    def get_sharing_ratio(self):
+        b = assetsView
+        if len(b.assets[b.assets['contributor_id'] == self.id]):
+            # print self.id
+            grpA = b.assets.groupby('contributor_id')
+            user = grpA.get_group(self.id)
+            total = len(user)
+            open = len(user[user["access"] == 'open'])
+            intra = len(user[user["access"] == 'intra'])
+            inter = len(user[user["access"] == 'inter'])
+            ratio = (intra + open + inter) / total
+        else:
+            ratio = 0.0
+
+        return ratio
+
+    def get_number_assets(self):
+        b = assetsView
+        if len(b.assets[b.assets['contributor_id'] == self.id]):
+            r = len(b.assets[b.assets['contributor_id'] == self.id])
+        else:
+            r = 0.0
+        return r
+
+    def is_in_coordination_inst(self):
+        c = Project((self.data['project_id'])).get_coordinator()
+        if isinstance(c, pandas.DataFrame):
+            d = c[c['institution_id'] == self.data['institution_id']]
+            if len(d) > 0:
+                r = True
+            else:
+                r =False
+        else:
+            r =False
+        return r
+
+    def has_pals(self):
+        c = Project((self.data['project_id'])).get_pals()
+        if isinstance(c, pandas.DataFrame):
+            d = c[c['institution_id'] == self.data['institution_id']]
+            if len(d) > 0:
+                r = True
+            else:
+                r =False
+        else:
+         r = False
+
+        return r
+
+    def get_pubmed_pubs(self):
+        x = PubmedSearcher()
+        auths = ""
+        pubs = x.get_auths_pubs(auths)
+        y = x.get_authors_list(pubs)
+        print y
 
 
 class Asset:
@@ -550,8 +738,8 @@ class Asset:
 
 
     def __is_intra(self, permissions):
-        projects = Project()
-        project_members = projects.get_members(self.project)
+        projects = Project(self.project)
+        project_members = projects.get_members()
 
         if set(permissions["user_id"]).issubset(set(project_members)) and \
                         len(permissions["user_id"]) == len(project_members):
@@ -559,19 +747,20 @@ class Asset:
         return ""
 
     def __is_partial_intra(self, permissions):
-        projects = Project()
-        project_members = projects.get_members(self.project)
+        projects = Project(self.project)
+        project_members = projects.get_members()
 
         # print permissions["user_id"]
         # print project_members
 
-        if set(permissions["user_id"]).issubset(set(project_members)):
+        if set(permissions["user_id"]).issubset(set(project_members)) and \
+            len(set(permissions["user_id"]).union(set(project_members))) > 2:
             return "partial_intra"
         return ""
 
     def __is_inter(self, permissions):
-        projects = Project()
-        project_members = projects.get_members(self.project)
+        projects = Project(self.project)
+        project_members = projects.get_members()
 
         if set(permissions["user_id"]).issuperset(set(project_members)):
             return "inter"
@@ -579,8 +768,8 @@ class Asset:
 
     def __remove_sysmodb_permissions(self, permissions):
         if self.project != 12:
-            projects = Project()
-            sysmodb_members = projects.get_members(12)
+            projects = Project(12)
+            sysmodb_members = projects.get_members()
             permissions = permissions[~permissions.user_id.isin(sysmodb_members)]
         return permissions
 
@@ -709,6 +898,13 @@ class MyDbTable:
            WHERE id=%s
         """, (value, id))
 
+    def update_publications_ds_ratio(self, value, id):
+        self.cursor.execute("""
+           UPDATE publications_copy
+           SET ds_ratio=%s
+           WHERE id=%s
+        """, (value, id))
+
 
     def close_con(self):
         self.db.commit()
@@ -718,4 +914,7 @@ class MyDbTable:
 dataTableView = DataTableView()
 modelTableView = ModelTableView()
 assetsView = AssetsView()
-
+userTableView = UserTableView()
+# userTableView.fill_sharing_ratio()
+# userTableView.fill_number_assets()
+# userTableView.fill_administrative_roles()

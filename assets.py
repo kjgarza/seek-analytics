@@ -33,20 +33,20 @@ class Asset:
 
     def is_intra(self, permissions):
         projects = ProjectTableView()
-        project_members = projects.get_members(self.info["project_id"])
+        project_members = projects.get_members()
 
         if set(permissions["user_id"]).issubset( set(project_members) ) and \
                 len(permissions["user_id"]) == len(project_members):
             return "intra"
 
     def is_partial_intra(self, permissions):
-        project_members = ProjectTableView.get_members(self.info["project_id"])
+        project_members = ProjectTableView.get_members()
 
         if set(permissions["user_id"]).issubset( set(project_members) ):
             return "partial_intra"
 
     def is_inter(self, permissions):
-        project_members = ProjectTableView.get_members(self.info["project_id"])
+        project_members = ProjectTableView.get_members()
 
         if set(permissions["user_id"]).issuperset( set(project_members) ):
             return "inter"
